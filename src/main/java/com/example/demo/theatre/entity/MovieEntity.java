@@ -20,6 +20,6 @@ import javax.persistence.Table;
 public class MovieEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long movieId;
+   private Long movieid;
    private String name;
 }

@@ -20,10 +20,10 @@ import javax.persistence.Table;
 public class ShowsEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long showId;
-   private TheatreEntity theatreEntity;
-   private ScreenEntity screenEntity;
-   private MovieEntity movieEntity;
-   private String showTimings;
-   private String date;
+   private Long showid;
+   private Long theatreid;
+   private Long screenid;
+   private Long movieid;
+   private String showtimings;
+   private String showdate;
 }

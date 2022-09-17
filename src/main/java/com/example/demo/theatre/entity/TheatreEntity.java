@@ -20,9 +20,9 @@ import javax.persistence.Table;
 public class TheatreEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long theatreId;
-   private String theatreName;
+   private Long theatreid;
+   private String theatrename;
    private String city;
-   private String pinCode;
+   private String pincode;
    private String area;
 }
