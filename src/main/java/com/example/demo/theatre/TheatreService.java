@@ -4,8 +4,10 @@ import com.example.demo.theatre.entity.MovieEntity;
 import com.example.demo.theatre.entity.ScreenEntity;
 import com.example.demo.theatre.entity.ShowsEntity;
 import com.example.demo.theatre.entity.TheatreEntity;
+import com.example.demo.theatre.model.ShowRequest;
 import com.example.demo.theatre.model.Movie;
 import com.example.demo.theatre.model.Screen;
+import com.example.demo.theatre.model.ShowResponse;
 import com.example.demo.theatre.model.Theatre;
 import com.example.demo.theatre.repository.MovieRepository;
 import com.example.demo.theatre.repository.ScreenRepository;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class TheatreService {
@@ -38,21 +42,62 @@ public class TheatreService {
 
       MovieEntity movieEntity = movieRepository.findByName(movieName);
       List<TheatreEntity> theatreEntity = theatreRepository.findByCity(city);
-      List<Long> theatreIds= theatreEntity.stream().map(TheatreEntity::getTheatreid).collect(Collectors.toList());
-      List<ShowsEntity> showsEntity = showsRepository.findByMovieIdAndTheatreId(movieEntity.getMovieid(), date, theatreIds);
-      List<Long> screenIds = showsEntity.stream().map(ShowsEntity::getScreenid).collect(Collectors.toList());
-      List<ScreenEntity> screenList = screenRepository.findByScreenId(screenIds);
-      List<Theatre> theatres = new ArrayList<>();
-      showsEntity.stream().forEach(t -> {
-         Movie movie = new Movie(movieName, date, t.getShowtimings());
-         ScreenEntity screenEntity =
-                 screenList.stream().filter(s -> s.getScreenid().equals(t.getScreenid())).findFirst().get();
-         Screen screen = new Screen(screenEntity.getScreenum(), screenEntity.getCapacity(), movie);
-         TheatreEntity theatreEntity1 =
-                 theatreEntity.stream().filter(s -> s.getTheatreid().equals(t.getTheatreid())).findFirst().get();
-        // Theatre theatre =  new Theatre(theatreEntity1.getTheatrename(), city, theatreEntity1.getArea(), screen);
-      });
+      List<Theatre> theatreList =  new ArrayList<>();
 
-      return new ArrayList<>();
+      theatreEntity.forEach(t -> {
+         List<ShowsEntity> showsEntity = showsRepository.findByMovieIdAndTheatreId(
+                 movieEntity.getMovieid(), date, t.getTheatreid());
+         List<Screen> screenList = new ArrayList<>();
+         showsEntity.forEach( s -> {
+            ScreenEntity screenEntity = screenRepository.findByScreenId(s.getScreenid());
+            Movie movie = new Movie(movieName, date, s.getShowtimings());
+            Screen screen = new Screen(screenEntity.getScreennum(), screenEntity.getCapacity(), movie);
+            screenList.add(screen);
+         });
+         if(!screenList.isEmpty()){
+            Theatre theatre = new Theatre(t.getTheatrename(), city, t.getArea(), screenList);
+            theatreList.add(theatre);
+         }
+      });
+      return theatreList;
+   }
+
+   public ShowResponse createShow(ShowRequest createShow) {
+      createShow.getScreenIdList().forEach( n -> {
+         Random random = new Random();
+         showsRepository.save(ShowsEntity.builder().showid(random.nextInt()).movieid(createShow.getMovieId())
+         .screenid(n).showdate(createShow.getDay()).showtimings(createShow.getShowsTiming())
+         .theatreid(createShow.getTheatreId()).build());
+      });
+      return new ShowResponse(createShow.getTheatreId(), createShow.getMovieId(),
+              createShow.getDay(),  createShow.getShowsTiming(),
+              createShow.getScreenIdList(), "CREATED");
+   }
+
+   public ShowResponse updateShow(ShowRequest createShow) {
+      List<ShowsEntity> showsEntityList = showsRepository.findByMovieIdAndTheatreId(
+              createShow.getMovieId(), createShow.getDay(), createShow.getTheatreId());
+      AtomicInteger atomicInteger =  new AtomicInteger();
+      createShow.getScreenIdList().forEach( n -> {
+          ShowsEntity showsEntity = showsEntityList.get(atomicInteger.getAndIncrement());
+          showsEntity.setScreenid(n);
+          showsEntity.setShowtimings(createShow.getShowsTiming());
+         showsRepository.save(showsEntity);
+      });
+      return new ShowResponse(createShow.getTheatreId(), createShow.getMovieId(),
+              createShow.getDay(),  createShow.getShowsTiming(),
+              createShow.getScreenIdList(), "UPDATED");
+   }
+
+   public ShowResponse deleteShow(ShowRequest createShow) {
+      List<ShowsEntity> showsEntityList = showsRepository.findByMovieIdAndTheatreId(
+              createShow.getMovieId(), createShow.getDay(), createShow.getTheatreId());
+      createShow.getScreenIdList().forEach(s -> {
+         ShowsEntity showsEntity = showsEntityList.stream().filter(show ->  show.getScreenid()==s).findFirst().get();
+         showsRepository.delete(showsEntity);
+      });
+      return new ShowResponse(createShow.getTheatreId(), createShow.getMovieId(),
+              createShow.getDay(),  createShow.getShowsTiming(),
+              createShow.getScreenIdList(), "DELETED");
    }
 }

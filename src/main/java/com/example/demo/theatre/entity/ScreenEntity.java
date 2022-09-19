@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class ScreenEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long screenid;
-   private int screenum;
+   private int screenid;
+   private int screennum;
    private int capacity;
 }

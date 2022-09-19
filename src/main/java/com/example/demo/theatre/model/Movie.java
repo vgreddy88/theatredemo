@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -14,5 +12,5 @@ import java.util.Map;
 public class Movie {
    private String name;
    private String date;
-   private String showTiming;
+   private String showTimings;
 }

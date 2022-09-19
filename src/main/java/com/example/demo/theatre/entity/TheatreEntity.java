@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class TheatreEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long theatreid;
+   private int theatreid;
    private String theatrename;
    private String city;
    private String pincode;

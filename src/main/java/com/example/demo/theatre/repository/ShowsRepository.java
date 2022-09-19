@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface ShowsRepository
         extends CrudRepository<ShowsEntity, Long> {
-   @Query(nativeQuery = true,value = "select * from shows where movieid = ?1 and showdate = ?2 and theatreid in (?3)")
-   public List<ShowsEntity> findByMovieIdAndTheatreId(Long movieId, String date, List<Long> theatreIds);
+   @Query(nativeQuery = true,value = "select * from shows where movieid = ?1 and showdate = ?2 and theatreid = ?3")
+   public List<ShowsEntity> findByMovieIdAndTheatreId(int movieId, String date, int theatreId);
 }

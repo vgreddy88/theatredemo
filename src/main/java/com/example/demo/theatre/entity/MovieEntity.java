@@ -1,6 +1,7 @@
 package com.example.demo.theatre.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,6 @@ import javax.persistence.Table;
 public class MovieEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long movieid;
+   private int movieid;
    private String name;
 }
